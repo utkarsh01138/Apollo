@@ -75,7 +75,11 @@ export const App: React.FC = () => {
               )}
             </div>
 
-            <AudioUploader onSessionLoaded={handleSessionLoaded} />
+            <AudioUploader
+              onSessionLoaded={handleSessionLoaded}
+              currentSession={currentSession}
+              onResetUpload={() => setCurrentSession(null)}
+            />
           </div>
 
           {/* Mixer Section */}

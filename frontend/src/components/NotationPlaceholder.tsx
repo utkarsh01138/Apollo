@@ -7,9 +7,9 @@ import {
   Download,
   Loader2,
   FileCode,
-  Music2,
   AlertCircle,
-  RefreshCw,
+  Grid,
+  FileText,
 } from 'lucide-react';
 import { NotationData, StemType } from '../types';
 import {
@@ -19,6 +19,7 @@ import {
   getNotationFileDownloadUrl,
 } from '../services/api';
 import { AlphaTabRenderer } from './AlphaTabRenderer';
+import { SAMPLE_NOTATION } from '../utils/sampleNotation';
 
 interface NotationViewerProps {
   sessionId?: string;
@@ -38,11 +39,14 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
   const [selectedStem, setSelectedStem] = useState<StemType>('bass');
   const [difficulty, setDifficulty] = useState<'beginner' | 'amateur' | 'pro'>('amateur');
   const [notationStyle, setNotationStyle] = useState<'tab' | 'sheet' | 'both'>('both');
+  const [viewTab, setViewTab] = useState<'score' | 'inspector'>('score');
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [stageMessage, setStageMessage] = useState<string>('');
   const [progress, setProgress] = useState<number>(0);
-  const [notationData, setNotationData] = useState<NotationData | null>(null);
+  // Default to sample notation so the right panel immediately displays rich musical content
+  const [notationData, setNotationData] = useState<NotationData>(SAMPLE_NOTATION.amateur);
+  const [isDemoData, setIsDemoData] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   // Transcribe stem & fetch notation
@@ -51,7 +55,7 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
     setError(null);
     setIsLoading(true);
     setProgress(10);
-    setStageMessage(`Starting pitch detection for ${stem}...`);
+    setStageMessage(`Analyzing audio frequencies for ${stem.toUpperCase()} stem...`);
 
     try {
       const { task_id } = await triggerTranscription(sessionId, stem);
@@ -61,7 +65,7 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
         try {
           const task = await fetchTaskStatus(task_id);
           setProgress(task.progress || 20);
-          setStageMessage(task.stage || 'Transcribing audio...');
+          setStageMessage(task.stage || 'Transcribing pitch & rhythm with Basic-Pitch...');
 
           if (task.status === 'completed') {
             clearInterval(poll);
@@ -69,10 +73,11 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
             // Fetch parsed notation
             const data = await fetchNotationData(sessionId, stem, diff);
             setNotationData(data);
+            setIsDemoData(false);
           } else if (task.status === 'failed') {
             clearInterval(poll);
             setIsLoading(false);
-            setError(task.error || 'Transcription failed.');
+            setError(task.error || 'Audio-to-MIDI transcription failed.');
           }
         } catch (err: any) {
           clearInterval(poll);
@@ -89,7 +94,13 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
   // Change difficulty for currently transcribed stem
   const handleDifficultyChange = async (newDiff: 'beginner' | 'amateur' | 'pro') => {
     setDifficulty(newDiff);
-    if (!sessionId || !notationData) return;
+
+    if (isDemoData) {
+      setNotationData(SAMPLE_NOTATION[newDiff]);
+      return;
+    }
+
+    if (!sessionId) return;
 
     try {
       const data = await fetchNotationData(sessionId, selectedStem, newDiff);
@@ -103,31 +114,46 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
   // Switch stem
   const handleStemChange = (newStem: StemType) => {
     setSelectedStem(newStem);
-    setNotationData(null);
-    if (sessionId) {
+    if (sessionId && hasStems) {
       handleTranscribe(newStem, difficulty);
+    } else {
+      // In demo mode, adjust stem
+      setNotationData({
+        ...SAMPLE_NOTATION[difficulty],
+        stem: newStem,
+      });
     }
   };
 
   // Auto-transcribe bass stem when session first becomes available
   useEffect(() => {
-    if (sessionId && hasStems && !notationData && !isLoading) {
+    if (sessionId && hasStems) {
       handleTranscribe('bass', 'amateur');
     }
   }, [sessionId, hasStems]);
 
+  // Calculate active bar based on current playback time
+  const tempo = notationData?.metadata?.tempo || 120;
+  const beatsPerSec = tempo / 60.0;
+  const currentBeat = currentTime * beatsPerSec;
+  const activeMeasureNumber = Math.floor(currentBeat / 4.0) + 1;
+
   return (
-    <div className="notation-card">
+    <div className="notation-card nothing-notation-card">
       {/* Top Toolbar */}
       <div className="notation-toolbar nothing-toolbar">
         <div className="toolbar-left">
           <div className="notation-title-group">
-            <BookOpen size={16} className="toolbar-icon" />
+            <BookOpen size={17} className="toolbar-icon" />
             <h3 className="toolbar-title nothing-font-dot">DYNAMIC SCORE // TABLATURE</h3>
           </div>
-          {activeSessionFilename && (
+          {isDemoData ? (
+            <span className="demo-indicator-pill nothing-font-mono">
+              PREVIEW // SAMPLE D-MINOR GROOVE
+            </span>
+          ) : activeSessionFilename ? (
             <span className="track-tag nothing-tag">{activeSessionFilename}</span>
-          )}
+          ) : null}
         </div>
 
         {/* Stem Selector Pills */}
@@ -138,7 +164,8 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
               type="button"
               className={`pill-btn nothing-pill-btn ${selectedStem === stemId ? 'active' : ''}`}
               onClick={() => handleStemChange(stemId)}
-              disabled={isLoading || !hasStems}
+              disabled={isLoading}
+              title={`View notation for ${stemId.toUpperCase()}`}
             >
               <span className="stem-dot-indicator" />
               <span>{stemId.toUpperCase()}</span>
@@ -147,7 +174,7 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
         </div>
       </div>
 
-      {/* Control Matrix: Difficulty & Notation Mode */}
+      {/* Control Matrix: Difficulty & View Toggles */}
       <div id="difficulty-controls" className="notation-controls-bar nothing-controls-bar">
         {/* Difficulty Scaling */}
         <div className="control-group">
@@ -162,7 +189,7 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
                 type="button"
                 className={`seg-btn nothing-seg-btn ${difficulty === level ? 'active' : ''}`}
                 onClick={() => handleDifficultyChange(level)}
-                disabled={isLoading || !hasStems}
+                disabled={isLoading}
               >
                 {level.toUpperCase()}
               </button>
@@ -170,96 +197,140 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
           </div>
         </div>
 
-        {/* Style Selector: Tab vs Standard Sheet Music vs Both */}
+        {/* View Switcher: Vector Score vs Measure Inspector */}
         <div className="control-group">
           <span className="control-label nothing-control-label">
             <Eye size={13} />
-            <span>VIEW:</span>
+            <span>MODE:</span>
           </span>
           <div className="segmented-control nothing-segmented">
             <button
               type="button"
-              className={`seg-btn nothing-seg-btn ${notationStyle === 'both' ? 'active' : ''}`}
-              onClick={() => setNotationStyle('both')}
+              className={`seg-btn nothing-seg-btn ${viewTab === 'score' ? 'active' : ''}`}
+              onClick={() => setViewTab('score')}
+              title="Publication-quality SVG stave & tablature"
             >
-              SCORE + TAB
+              <FileText size={12} className="btn-inline-icon" />
+              <span>SCORE</span>
             </button>
             <button
               type="button"
-              className={`seg-btn nothing-seg-btn ${notationStyle === 'tab' ? 'active' : ''}`}
-              onClick={() => setNotationStyle('tab')}
+              className={`seg-btn nothing-seg-btn ${viewTab === 'inspector' ? 'active' : ''}`}
+              onClick={() => setViewTab('inspector')}
+              title="Measure-by-measure note & fret breakdown"
             >
-              TAB ONLY
-            </button>
-            <button
-              type="button"
-              className={`seg-btn nothing-seg-btn ${notationStyle === 'sheet' ? 'active' : ''}`}
-              onClick={() => setNotationStyle('sheet')}
-            >
-              SCORE
+              <Grid size={12} className="btn-inline-icon" />
+              <span>MEASURES</span>
             </button>
           </div>
         </div>
+
+        {/* Sub-view: Tab vs Sheet (When in Score View) */}
+        {viewTab === 'score' && (
+          <div className="control-group">
+            <div className="segmented-control nothing-segmented sub-segmented">
+              <button
+                type="button"
+                className={`seg-btn nothing-seg-btn ${notationStyle === 'both' ? 'active' : ''}`}
+                onClick={() => setNotationStyle('both')}
+              >
+                SCORE + TAB
+              </button>
+              <button
+                type="button"
+                className={`seg-btn nothing-seg-btn ${notationStyle === 'tab' ? 'active' : ''}`}
+                onClick={() => setNotationStyle('tab')}
+              >
+                TAB ONLY
+              </button>
+              <button
+                type="button"
+                className={`seg-btn nothing-seg-btn ${notationStyle === 'sheet' ? 'active' : ''}`}
+                onClick={() => setNotationStyle('sheet')}
+              >
+                SCORE
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Notation Content / Render Area */}
-      <div className="notation-canvas">
+      {/* Musical Intelligence & Telemetry Dashboard */}
+      <div className="telemetry-dashboard-bar">
+        <div className="telemetry-pill">
+          <span className="telemetry-label">KEY:</span>
+          <span className="telemetry-val">{notationData.metadata.key_signature}</span>
+        </div>
+        <div className="telemetry-pill">
+          <span className="telemetry-label">METER:</span>
+          <span className="telemetry-val">{notationData.metadata.time_signature}</span>
+        </div>
+        <div className="telemetry-pill">
+          <span className="telemetry-label">TEMPO:</span>
+          <span className="telemetry-val">{notationData.metadata.tempo} BPM</span>
+        </div>
+        <div className="telemetry-pill">
+          <span className="telemetry-label">BARS:</span>
+          <span className="telemetry-val">{notationData.metadata.total_measures || notationData.measures.length}</span>
+        </div>
+        <div className="telemetry-pill">
+          <span className="telemetry-label">NOTES:</span>
+          <span className="telemetry-val">{notationData.metadata.total_notes}</span>
+        </div>
+        <div className="telemetry-pill">
+          <span className="telemetry-label">TUNING:</span>
+          <span className="telemetry-val">
+            {selectedStem === 'bass' ? 'G2 · D2 · A1 · E1' : 'E4 · B3 · G3 · D3 · A2 · E2'}
+          </span>
+        </div>
+
+        {/* File Exports */}
+        <div id="export-section" className="download-actions nothing-download-actions">
+          {sessionId ? (
+            <>
+              <a
+                href={getNotationFileDownloadUrl(sessionId, selectedStem, 'midi')}
+                className="download-btn nothing-download-btn"
+                download
+                title="Download raw MIDI file"
+              >
+                <Download size={12} />
+                <span>MIDI</span>
+              </a>
+              <a
+                href={getNotationFileDownloadUrl(sessionId, selectedStem, 'musicxml', difficulty)}
+                className="download-btn nothing-download-btn"
+                download
+                title="Download MusicXML score"
+              >
+                <FileCode size={12} />
+                <span>MUSICXML</span>
+              </a>
+            </>
+          ) : (
+            <span className="demo-notice-tag nothing-font-mono">EXPORTS // ACTIVE POST-UPLOAD</span>
+          )}
+        </div>
+      </div>
+
+      {/* Main Notation Display Area */}
+      <div className="notation-canvas nothing-notation-canvas">
         {isLoading ? (
-          <div className="staged-preview">
-            <Loader2 className="spinner-icon" size={36} />
-            <h4>Basic-Pitch & Music21 Pipeline</h4>
-            <p className="processing-subtitle">{stageMessage}</p>
-            <div className="progress-container">
-              <div className="progress-bar" style={{ width: `${progress}%` }} />
+          <div className="staged-preview nothing-staged-preview">
+            <div className="nothing-processing-indicator">
+              <Loader2 className="spinner-icon nothing-spinner" size={36} />
+              <span className="nothing-led-dot red-pulse" />
             </div>
-            <span className="progress-percent">{Math.round(progress)}%</span>
+            <h4 className="nothing-font-dot">BASIC-PITCH & MUSIC21 PIPELINE</h4>
+            <p className="processing-subtitle nothing-font-mono">{stageMessage}</p>
+            <div className="progress-container nothing-progress-container">
+              <div className="progress-bar nothing-progress-bar" style={{ width: `${progress}%` }} />
+            </div>
+            <span className="progress-percent nothing-font-mono">{Math.round(progress)}%</span>
           </div>
-        ) : notationData ? (
+        ) : viewTab === 'score' ? (
+          /* Mode 1: High-Resolution Vector AlphaTab Score */
           <div className="notation-display-container">
-            {/* Metadata Banner & File Downloads */}
-            <div className="notation-metadata-banner">
-              <div className="meta-pill">
-                <strong>Key:</strong> {notationData.metadata.key_signature}
-              </div>
-              <div className="meta-pill">
-                <strong>Meter:</strong> {notationData.metadata.time_signature}
-              </div>
-              <div className="meta-pill">
-                <strong>Tempo:</strong> {notationData.metadata.tempo} BPM
-              </div>
-              <div className="meta-pill">
-                <strong>Notes:</strong> {notationData.metadata.total_notes}
-              </div>
-              <div className="meta-pill tier-pill">
-                <strong>Tier:</strong> {difficulty.toUpperCase()}
-              </div>
-
-              {/* Download Buttons */}
-              {sessionId && (
-                <div id="export-section" className="download-actions nothing-download-actions">
-                  <a
-                    href={getNotationFileDownloadUrl(sessionId, selectedStem, 'midi')}
-                    className="download-btn nothing-download-btn"
-                    download
-                    title="Download raw MIDI file"
-                  >
-                    <Download size={13} />
-                    <span>MIDI</span>
-                  </a>
-                  <a
-                    href={getNotationFileDownloadUrl(sessionId, selectedStem, 'musicxml', difficulty)}
-                    className="download-btn nothing-download-btn"
-                    download
-                    title="Download MusicXML score"
-                  >
-                    <FileCode size={13} />
-                    <span>MUSICXML</span>
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Dynamic AlphaTab Vector Score Rendering */}
             <AlphaTabRenderer
               notationData={notationData}
               notationStyle={notationStyle}
@@ -267,54 +338,73 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
               isPlaying={isPlaying}
             />
 
-            {/* Difficulty Summary Info */}
-            <div className="difficulty-insight">
+            {/* Difficulty Tier Explanation Banner */}
+            <div className="difficulty-insight nothing-difficulty-insight">
               <Sparkles size={14} className="insight-icon" />
               <span>
                 {difficulty === 'beginner' &&
-                  'Beginner Tier: Notes quantized to 8th/quarter roots; fast passing tones and chords simplified.'}
+                  'BEGINNER TIER: Quantized to 8th and quarter note roots. Complex syncopations and passing tones simplified for accessible practice.'}
                 {difficulty === 'amateur' &&
-                  'Amateur Tier: 16th-note grid quantization applied; syncopation preserved with ornaments filtered.'}
+                  'AMATEUR TIER: 16th-note rhythmic grid applied. Grooves and syncopated riffs preserved with micro-ornaments filtered.'}
                 {difficulty === 'pro' &&
-                  'Pro Tier: Unfiltered 1:1 transcription showing complete micro-rhythmic precision.'}
+                  'PRO TIER: 1:1 verbatim transcription capturing micro-rhythmic precision and exact performance nuances.'}
               </span>
             </div>
           </div>
         ) : (
-          /* Empty / Initial State */
-          <div className="staged-preview">
-            <div className="preview-badge">
-              <Music2 size={16} />
-              <span>AlphaTab Vector Engine Ready</span>
-            </div>
+          /* Mode 2: Measure Inspector & Tab Matrix Breakdown */
+          <div className="measures-inspector-view">
+            <div className="measures-grid-container">
+              {notationData.measures.map((measure) => {
+                const isCurrentMeasure = isPlaying && measure.number === activeMeasureNumber;
 
-            <div className="staff-graphic">
-              <div className="tab-lines">
-                <span className="string-label">G |-----------------------5---7~-----|</span>
-                <span className="string-label">D |-----------5---7---7h8------------|</span>
-                <span className="string-label">A |--5---7---------------------------|</span>
-                <span className="string-label">E |-----------------------------------|</span>
-              </div>
-            </div>
+                return (
+                  <div
+                    key={measure.number}
+                    className={`measure-matrix-card ${isCurrentMeasure ? 'active-playhead-bar' : ''}`}
+                  >
+                    <div className="measure-card-header">
+                      <span className="measure-num nothing-font-mono">
+                        BAR_{measure.number.toString().padStart(2, '0')}
+                      </span>
+                      {isCurrentMeasure && (
+                        <span className="live-bar-indicator">
+                          <span className="nothing-led-dot red-pulse" />
+                          <span>PLAYING</span>
+                        </span>
+                      )}
+                    </div>
 
-            <div className="placeholder-info">
-              <h4>Audio-to-MIDI & Vector Notation Engine</h4>
-              <p>
-                {hasStems
-                  ? 'Stems are ready in the Jam Room! Click below to transcribe the isolated stem and render vector sheet music & tablature.'
-                  : 'Upload an audio file on the left to extract stems and generate dynamic sheet music & tablature.'}
-              </p>
+                    <div className="measure-notes-stream">
+                      {measure.notes && measure.notes.length > 0 ? (
+                        measure.notes.map((note, noteIdx) => {
+                          if (note.is_rest) {
+                            return (
+                              <div key={noteIdx} className="note-chip rest-chip">
+                                <span className="chip-note-name">REST</span>
+                                <span className="chip-duration">{note.duration}b</span>
+                              </div>
+                            );
+                          }
 
-              {hasStems && sessionId && (
-                <button
-                  type="button"
-                  className="browse-button"
-                  onClick={() => handleTranscribe(selectedStem, difficulty)}
-                >
-                  <RefreshCw size={15} />
-                  <span>Transcribe {selectedStem.toUpperCase()} Track</span>
-                </button>
-              )}
+                          return (
+                            <div key={noteIdx} className="note-chip active-note-chip">
+                              <span className="chip-note-name">{note.pitch || 'NOTE'}</span>
+                              <div className="chip-fret-badge">
+                                <span className="chip-string">STR {note.string || 2}</span>
+                                <span className="chip-fret">FRET {note.fret !== undefined ? note.fret : 0}</span>
+                              </div>
+                              <span className="chip-duration nothing-font-mono">{note.duration}b</span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <span className="empty-measure-text">Whole Rest</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

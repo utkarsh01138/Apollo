@@ -42,10 +42,10 @@
   --radius-xl: 28px;
   --radius-full: 9999px;
 
-  /* Typography */
-  --font-sans: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'Space Mono', 'JetBrains Mono', monospace;
-  --font-dot: 'Silkscreen', 'Space Mono', monospace;
+  /* Typography: Sleek Modern Nothing OS Aesthetics (Zero Pixelated Arcade Fonts) */
+  --font-sans: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Space Mono', monospace;
+  --font-dot: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 *, *::before, *::after {
@@ -79,6 +79,7 @@ body {
    ========================================================================== */
 .nothing-font-dot {
   font-family: var(--font-dot);
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -540,6 +541,170 @@ body {
   font-weight: 700;
   color: #ffffff;
   letter-spacing: 0.05em;
+}
+
+.processing-footer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.processing-meta {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   Loaded Track Success State // Prominent Nothing OS Hardware Banner
+   ========================================================================== */
+.dropzone.track-loaded-zone {
+  border: 1px solid var(--border-strong);
+  background-color: rgba(14, 14, 14, 0.95);
+  padding: 1.5rem;
+  cursor: default;
+  text-align: left;
+  align-items: stretch;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.dropzone.track-loaded-zone:hover {
+  border-color: #555555;
+  background-color: #121212;
+}
+
+.loaded-track-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+}
+
+.loaded-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.success-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-dot);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+}
+
+.success-status-pill .success-icon {
+  color: #ffffff;
+}
+
+.session-id-pill {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+.loaded-track-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.track-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background-color: #000000;
+  border: 1px solid var(--border-strong);
+  flex-shrink: 0;
+}
+
+.loaded-music-icon {
+  color: #ffffff;
+}
+
+.track-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  overflow: hidden;
+}
+
+.loaded-track-name {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.loaded-track-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.stems-status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .stems-status-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stem-status-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.65rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.chip-led-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+.chip-name {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.chip-status {
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+.loaded-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
 }
 
 .error-alert {
@@ -1289,6 +1454,186 @@ body {
   color: #000000;
 }
 
+/* ==========================================================================
+   Musical Intelligence Telemetry Bar & Measures Inspector
+   ========================================================================== */
+.telemetry-dashboard-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.85rem;
+  background-color: #0c0c0c;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-top: 0.65rem;
+}
+
+.telemetry-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.25rem 0.6rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+}
+
+.telemetry-label {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.telemetry-val {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.demo-indicator-pill {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+  background-color: var(--nothing-red-subtle);
+  border: 1px solid rgba(215, 25, 33, 0.35);
+  color: #ff6b72;
+  letter-spacing: 0.05em;
+}
+
+.demo-notice-tag {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.btn-inline-icon {
+  margin-right: 0.3rem;
+}
+
+.sub-segmented {
+  margin-left: 0.25rem;
+}
+
+/* Measure Matrix Inspector View */
+.measures-inspector-view {
+  width: 100%;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+
+.measures-grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .measures-grid-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.measure-matrix-card {
+  background-color: #0c0c0c;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: all 0.2s ease;
+}
+
+.measure-matrix-card:hover {
+  border-color: var(--border-strong);
+  background-color: #111111;
+}
+
+.measure-matrix-card.active-playhead-bar {
+  border-color: var(--nothing-red);
+  box-shadow: 0 0 16px var(--nothing-red-glow);
+  background-color: rgba(215, 25, 33, 0.04);
+}
+
+.measure-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #1c1c1c;
+}
+
+.live-bar-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--nothing-red);
+  font-family: var(--font-dot);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+}
+
+.measure-notes-stream {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.note-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.note-chip.active-note-chip {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  color: #ffffff;
+}
+
+.note-chip.rest-chip {
+  background-color: transparent;
+  border: 1px dashed #242424;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.chip-note-name {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.chip-fret-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #1e1e1e;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.chip-duration {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.empty-measure-text {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
 .difficulty-insight {
   display: flex;
   align-items: center;
@@ -1373,6 +1718,7 @@ body {
 .alphatab-container svg {
   display: block;
   margin: 0 auto;
+  filter: invert(0.92) contrast(1.15) brightness(1.2);
 }
 
 /* Nothing Red Active Playhead Highlight */
