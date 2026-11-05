@@ -94,14 +94,14 @@ Apollo/
 
 ## 🗺️ Roadmap & Prioritization
 
-### Phase 1: Backend Foundation & Stem Extraction (Current Focus)
+### Phase 1: Backend Foundation & Stem Extraction (Completed)
 - [x] Repository initialization, documentation foundation, and environment design.
-- [ ] Scaffold FastAPI backend architecture with modular router structure.
-- [ ] Integrate Demucs v4 pipeline for 4-stem local isolation (Vocals, Bass, Drums, Other).
-- [ ] Build asynchronous task management to decouple audio processing from HTTP requests.
-- [ ] Implement local storage management and auto-cleanup for temporary stem files.
+- [x] Scaffold FastAPI backend architecture with modular router structure.
+- [x] Integrate Demucs v4 pipeline for 4-stem local isolation (Vocals, Bass, Drums, Other).
+- [x] Build asynchronous task management to decouple audio processing from HTTP requests.
+- [x] Implement local storage management and auto-cleanup for temporary stem files.
 
-### Phase 2: Transcription & Notation Logic
+### Phase 2: Transcription & Notation Logic (Current Focus)
 - [ ] Integrate Spotify's Basic-Pitch for audio-to-MIDI stem transcription.
 - [ ] Implement Music21 parser for MIDI post-processing and quantification.
 - [ ] Develop dynamic difficulty reduction algorithms (Beginner, Amateur, Pro) to strip syncopations and rapid passing tones.
