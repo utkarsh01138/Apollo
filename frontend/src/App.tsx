@@ -90,6 +90,7 @@ export const App: React.FC = () => {
         {/* Right Column: Dynamic Sheet Music & Tablature View */}
         <section className="workspace-column right-pane">
           <NotationPlaceholder
+            sessionId={currentSession?.session_id}
             activeSessionFilename={currentSession?.original_filename}
             hasStems={Boolean(currentSession)}
           />

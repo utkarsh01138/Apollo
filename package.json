@@ -11,3 +11,4 @@
     "test:backend": "backend\\.venv\\Scripts\\python.exe backend\\tests\\run_tests.py"
   }
 }
+

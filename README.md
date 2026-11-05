@@ -101,18 +101,18 @@ Apollo/
 - [x] Build asynchronous task management to decouple audio processing from HTTP requests.
 - [x] Implement local storage management and auto-cleanup for temporary stem files.
 
-### Phase 2: Transcription & Notation Logic (Current Focus)
-- [ ] Integrate Spotify's Basic-Pitch for audio-to-MIDI stem transcription.
-- [ ] Implement Music21 parser for MIDI post-processing and quantification.
-- [ ] Develop dynamic difficulty reduction algorithms (Beginner, Amateur, Pro) to strip syncopations and rapid passing tones.
-- [ ] Expose notation endpoints outputting structured notation payloads and MusicXML.
+### Phase 2: Transcription & Notation Logic (Completed)
+- [x] Integrate Spotify's Basic-Pitch for audio-to-MIDI stem transcription.
+- [x] Implement Music21 parser for MIDI post-processing and quantification.
+- [x] Develop dynamic difficulty reduction algorithms (Beginner, Amateur, Pro) to strip syncopations and rapid passing tones.
+- [x] Expose notation endpoints outputting structured notation payloads and MusicXML.
 
 ### Phase 3: Frontend Scaffolding & Audio Engine (Completed)
 - [x] Scaffold React (Vite + TypeScript) application shell.
 - [x] Build the interactive multi-track audio mixer ("The Jam Room") with synchronized Web Audio stems.
 - [x] Implement independent mute/solo matrices and time-stretch/tempo controls.
 
-### Phase 4: Dynamic Notation Rendering & Polish
+### Phase 4: Dynamic Notation Rendering & Polish (Current Focus)
 - [ ] Integrate AlphaTab / VexFlow for interactive tablature and sheet music display.
 - [ ] Synchronize visual playhead cursor with active stem audio playback.
 - [ ] Implement dynamic difficulty and notation style toggles.

@@ -38,3 +38,38 @@ export interface TaskInfo {
   };
   error?: string;
 }
+
+export interface NotationNote {
+  is_rest: boolean;
+  is_chord?: boolean;
+  pitch?: string;
+  step?: string;
+  octave?: number;
+  midi?: number;
+  duration: number;
+  offset: number;
+  string?: number;
+  fret?: number;
+  velocity?: number;
+  pitches?: Array<{ pitch: string; midi: number; string: number; fret: number }>;
+}
+
+export interface NotationMeasure {
+  number: number;
+  notes: NotationNote[];
+}
+
+export interface NotationData {
+  session_id: string;
+  stem: string;
+  difficulty: 'beginner' | 'amateur' | 'pro';
+  metadata: {
+    key_signature: string;
+    time_signature: string;
+    tempo: number;
+    total_measures: number;
+    total_notes: number;
+    musicxml_file: string;
+  };
+  measures: NotationMeasure[];
+}

@@ -1,4 +1,4 @@
-import { SessionInfo, TaskInfo } from '../types';
+import { NotationData, SessionInfo, TaskInfo } from '../types';
 
 const API_BASE = '/api/v1';
 
@@ -43,4 +43,54 @@ export async function fetchSession(sessionId: string): Promise<SessionInfo> {
 
 export function getStemUrl(sessionId: string, stemName: string): string {
   return `${API_BASE}/stems/${sessionId}/${stemName}`;
+}
+
+export async function triggerTranscription(
+  sessionId: string,
+  stemName: string
+): Promise<{
+  status: string;
+  message: string;
+  task_id: string;
+  session_id: string;
+  stem: string;
+}> {
+  const response = await fetch(`${API_BASE}/midi/transcribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: sessionId, stem_name: stemName }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Transcription request failed: HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function fetchNotationData(
+  sessionId: string,
+  stemName: string,
+  difficulty: 'beginner' | 'amateur' | 'pro'
+): Promise<NotationData> {
+  const response = await fetch(
+    `${API_BASE}/midi/${sessionId}/notation?stem=${stemName}&difficulty=${difficulty}`
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Failed to fetch notation: HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export function getNotationFileDownloadUrl(
+  sessionId: string,
+  stemName: string,
+  format: 'midi' | 'musicxml',
+  difficulty: string = 'amateur'
+): string {
+  return `${API_BASE}/midi/${sessionId}/file?stem=${stemName}&format=${format}&difficulty=${difficulty}`;
 }

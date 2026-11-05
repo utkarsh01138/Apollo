@@ -15,6 +15,8 @@ sys.path.insert(0, str(backend_dir))
 
 from app.core.session_manager import SessionManager
 from app.core.task_manager import TaskManager, TaskStatus
+from app.services.basic_pitch_service import BasicPitchService
+from app.services.notation_service import NotationService, map_midi_to_tab
 
 
 class TestSessionManager(unittest.TestCase):
@@ -96,6 +98,69 @@ class TestTaskManager(unittest.TestCase):
             self.assertIn("Audio channel decode error", t.error)
 
         asyncio.run(_test())
+
+
+class TestNotationService(unittest.TestCase):
+    def test_tablature_mapping(self):
+        s4, f0 = map_midi_to_tab(28, is_bass=True)
+        self.assertEqual(s4, 4)
+        self.assertEqual(f0, 0)
+
+        s3, f0 = map_midi_to_tab(33, is_bass=True)
+        self.assertEqual(s3, 3)
+        self.assertEqual(f0, 0)
+
+        s_e2, f_e2 = map_midi_to_tab(40, is_bass=True)
+        self.assertEqual(f_e2, 2)
+
+    def test_notation_difficulty_scaling(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            midi_path = temp_path / "bass_raw.mid"
+            output_dir = temp_path / "notation"
+
+            bp_service = BasicPitchService()
+            notation_svc = NotationService()
+
+            async def dummy_progress(p, s):
+                pass
+
+            dummy_audio = temp_path / "bass.wav"
+            dummy_audio.write_bytes(b"RIFF" + b"\x00" * 300)
+
+            asyncio.run(
+                bp_service.transcribe_to_midi_async(
+                    audio_path=dummy_audio,
+                    output_midi_path=midi_path,
+                    stem_name="bass",
+                    progress_cb=dummy_progress,
+                )
+            )
+
+            self.assertTrue(midi_path.exists())
+
+            results = notation_svc.process_midi_notation(
+                midi_path=midi_path,
+                session_id="test_session",
+                stem_name="bass",
+                output_dir=output_dir,
+            )
+
+            self.assertIn("pro", results)
+            self.assertIn("amateur", results)
+            self.assertIn("beginner", results)
+
+            pro_notes = results["pro"]["metadata"]["total_notes"]
+            amateur_notes = results["amateur"]["metadata"]["total_notes"]
+            beginner_notes = results["beginner"]["metadata"]["total_notes"]
+
+            # Beginner <= Amateur <= Pro note counts
+            self.assertLessEqual(beginner_notes, amateur_notes)
+            self.assertLessEqual(amateur_notes, pro_notes)
+
+            # Check MusicXML generation
+            self.assertTrue((output_dir / "bass_pro.musicxml").exists())
+            self.assertTrue((output_dir / "bass_beginner.musicxml").exists())
 
 
 if __name__ == "__main__":
