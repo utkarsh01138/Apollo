@@ -119,51 +119,52 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
   return (
     <div className="notation-card">
       {/* Top Toolbar */}
-      <div className="notation-toolbar">
+      <div className="notation-toolbar nothing-toolbar">
         <div className="toolbar-left">
           <div className="notation-title-group">
-            <BookOpen size={18} className="toolbar-icon" />
-            <h3 className="toolbar-title">Dynamic Score & Tablature</h3>
+            <BookOpen size={16} className="toolbar-icon" />
+            <h3 className="toolbar-title nothing-font-dot">DYNAMIC SCORE // TABLATURE</h3>
           </div>
           {activeSessionFilename && (
-            <span className="track-tag">{activeSessionFilename}</span>
+            <span className="track-tag nothing-tag">{activeSessionFilename}</span>
           )}
         </div>
 
         {/* Stem Selector Pills */}
-        <div className="stem-selector-pills">
+        <div className="stem-selector-pills nothing-pills">
           {(['bass', 'vocals', 'other'] as StemType[]).map((stemId) => (
             <button
               key={stemId}
               type="button"
-              className={`pill-btn ${selectedStem === stemId ? 'active' : ''}`}
+              className={`pill-btn nothing-pill-btn ${selectedStem === stemId ? 'active' : ''}`}
               onClick={() => handleStemChange(stemId)}
               disabled={isLoading || !hasStems}
             >
-              {stemId.charAt(0).toUpperCase() + stemId.slice(1)}
+              <span className="stem-dot-indicator" />
+              <span>{stemId.toUpperCase()}</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Control Matrix: Difficulty & Notation Mode */}
-      <div className="notation-controls-bar">
+      <div id="difficulty-controls" className="notation-controls-bar nothing-controls-bar">
         {/* Difficulty Scaling */}
         <div className="control-group">
-          <span className="control-label">
-            <SlidersHorizontal size={14} />
-            <span>Difficulty:</span>
+          <span className="control-label nothing-control-label">
+            <SlidersHorizontal size={13} />
+            <span>DIFFICULTY:</span>
           </span>
-          <div className="segmented-control">
+          <div className="segmented-control nothing-segmented">
             {(['beginner', 'amateur', 'pro'] as const).map((level) => (
               <button
                 key={level}
                 type="button"
-                className={`seg-btn ${difficulty === level ? 'active' : ''}`}
+                className={`seg-btn nothing-seg-btn ${difficulty === level ? 'active' : ''}`}
                 onClick={() => handleDifficultyChange(level)}
                 disabled={isLoading || !hasStems}
               >
-                {level.charAt(0).toUpperCase() + level.slice(1)}
+                {level.toUpperCase()}
               </button>
             ))}
           </div>
@@ -171,31 +172,31 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
 
         {/* Style Selector: Tab vs Standard Sheet Music vs Both */}
         <div className="control-group">
-          <span className="control-label">
-            <Eye size={14} />
-            <span>View:</span>
+          <span className="control-label nothing-control-label">
+            <Eye size={13} />
+            <span>VIEW:</span>
           </span>
-          <div className="segmented-control">
+          <div className="segmented-control nothing-segmented">
             <button
               type="button"
-              className={`seg-btn ${notationStyle === 'both' ? 'active' : ''}`}
+              className={`seg-btn nothing-seg-btn ${notationStyle === 'both' ? 'active' : ''}`}
               onClick={() => setNotationStyle('both')}
             >
-              Score + TAB
+              SCORE + TAB
             </button>
             <button
               type="button"
-              className={`seg-btn ${notationStyle === 'tab' ? 'active' : ''}`}
+              className={`seg-btn nothing-seg-btn ${notationStyle === 'tab' ? 'active' : ''}`}
               onClick={() => setNotationStyle('tab')}
             >
-              Tab Only
+              TAB ONLY
             </button>
             <button
               type="button"
-              className={`seg-btn ${notationStyle === 'sheet' ? 'active' : ''}`}
+              className={`seg-btn nothing-seg-btn ${notationStyle === 'sheet' ? 'active' : ''}`}
               onClick={() => setNotationStyle('sheet')}
             >
-              Standard Score
+              SCORE
             </button>
           </div>
         </div>
@@ -235,10 +236,10 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
 
               {/* Download Buttons */}
               {sessionId && (
-                <div className="download-actions">
+                <div id="export-section" className="download-actions nothing-download-actions">
                   <a
                     href={getNotationFileDownloadUrl(sessionId, selectedStem, 'midi')}
-                    className="download-btn"
+                    className="download-btn nothing-download-btn"
                     download
                     title="Download raw MIDI file"
                   >
@@ -247,12 +248,12 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
                   </a>
                   <a
                     href={getNotationFileDownloadUrl(sessionId, selectedStem, 'musicxml', difficulty)}
-                    className="download-btn"
+                    className="download-btn nothing-download-btn"
                     download
                     title="Download MusicXML score"
                   >
                     <FileCode size={13} />
-                    <span>MusicXML</span>
+                    <span>MUSICXML</span>
                   </a>
                 </div>
               )}

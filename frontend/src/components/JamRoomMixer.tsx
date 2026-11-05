@@ -67,45 +67,45 @@ export const JamRoomMixer: React.FC<JamRoomMixerProps> = ({
   return (
     <div className="mixer-container">
       {/* Top Master Transport Bar */}
-      <div className="master-transport">
+      <div className="master-transport nothing-transport">
         <div className="transport-left">
           <button
             type="button"
-            className="play-button"
+            className={`play-button nothing-play-button ${isPlaying ? 'playing' : ''}`}
             onClick={onTogglePlay}
             disabled={isLoadingStems || duration === 0}
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
-            {isPlaying ? <Pause size={22} /> : <Play size={22} className="play-icon-offset" />}
+            {isPlaying ? <Pause size={20} /> : <Play size={20} className="play-icon-offset" />}
           </button>
 
           <button
             type="button"
-            className="control-button"
+            className="control-button nothing-control-button"
             onClick={onReset}
             disabled={isLoadingStems || duration === 0}
             aria-label="Restart playback"
             title="Reset to start"
           >
-            <RotateCcw size={18} />
+            <RotateCcw size={16} />
           </button>
 
-          <div className="time-display">
-            <span className="current-time">{formatTime(currentTime)}</span>
-            <span className="time-separator">/</span>
-            <span className="total-time">{formatTime(duration)}</span>
+          <div className="time-display nothing-time-display">
+            <span className="current-time nothing-font-mono">{formatTime(currentTime)}</span>
+            <span className="time-separator">//</span>
+            <span className="total-time nothing-font-mono">{formatTime(duration)}</span>
           </div>
         </div>
 
         {/* Global Timeline Scrubber */}
-        <div className="timeline-wrapper">
+        <div className="timeline-wrapper nothing-timeline">
           <label htmlFor="timeline-scrubber" className="sr-only">
             Timeline Scrubber
           </label>
           <input
             id="timeline-scrubber"
             type="range"
-            className="apollo-range timeline-slider"
+            className="apollo-range timeline-slider nothing-range"
             min={0}
             max={duration || 100}
             step={0.1}
@@ -126,12 +126,12 @@ export const JamRoomMixer: React.FC<JamRoomMixerProps> = ({
         {/* Master Controls & Tempo */}
         <div className="transport-right">
           {/* Tempo Multiplier */}
-          <div className="tempo-selector">
-            <Gauge size={16} className="tempo-icon" />
+          <div className="tempo-selector nothing-tempo">
+            <Gauge size={14} className="tempo-icon" />
             <select
               value={playbackRate}
               onChange={(e) => onPlaybackRateChange(parseFloat(e.target.value))}
-              className="tempo-dropdown"
+              className="tempo-dropdown nothing-tempo-select"
               aria-label="Playback speed"
             >
               <option value={0.5}>0.5x</option>
@@ -143,18 +143,18 @@ export const JamRoomMixer: React.FC<JamRoomMixerProps> = ({
           </div>
 
           {/* Master Volume */}
-          <div className="master-volume">
+          <div className="master-volume nothing-master-volume">
             <button
               type="button"
-              className="mute-button"
+              className="mute-button nothing-vol-button"
               onClick={() => onMasterVolumeChange(masterVolume > 0 ? 0 : 0.9)}
               aria-label={masterVolume === 0 ? 'Unmute master' : 'Mute master'}
             >
-              {masterVolume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              {masterVolume === 0 ? <VolumeX size={16} /> : <Volume2 size={16} />}
             </button>
             <input
               type="range"
-              className="apollo-range master-slider"
+              className="apollo-range master-slider nothing-range"
               min={0}
               max={1}
               step={0.01}
@@ -175,8 +175,8 @@ export const JamRoomMixer: React.FC<JamRoomMixerProps> = ({
       </div>
 
       {/* Stem Mixer Channel Matrix */}
-      <div className="stem-channels-grid">
-        {stems.map((stem) => {
+      <div className="stem-channels-grid nothing-channels-grid">
+        {stems.map((stem, index) => {
           const isAudible = hasAnySolo
             ? stem.isSolo && !stem.isMuted
             : !stem.isMuted && stem.volume > 0;
@@ -184,42 +184,41 @@ export const JamRoomMixer: React.FC<JamRoomMixerProps> = ({
           return (
             <div
               key={stem.id}
-              className={`stem-channel-card ${!isAudible ? 'attenuated' : ''} ${
+              className={`stem-channel-card nothing-channel-card ${!isAudible ? 'attenuated' : ''} ${
                 stem.isSolo ? 'solo-active' : ''
               }`}
               style={{ '--stem-accent': stem.color } as React.CSSProperties}
             >
               {/* Channel Header */}
-              <div className="channel-header">
-                <div className="stem-icon-badge" style={{ color: stem.color }}>
+              <div className="channel-header nothing-channel-header">
+                <div className="stem-icon-badge nothing-icon-pill">
                   {STEM_ICONS[stem.id]}
                 </div>
                 <div className="stem-meta">
-                  <h4 className="stem-title">{stem.label}</h4>
-                  <span className="stem-badge">{stem.id.toUpperCase()}</span>
+                  <h4 className="stem-title nothing-font-dot">{stem.label}</h4>
+                  <span className="stem-badge nothing-font-mono">CH_{`0${index + 1}`} // {stem.id.toUpperCase()}</span>
                 </div>
               </div>
 
               {/* Channel Meters */}
-              <div className="channel-meter">
+              <div className="channel-meter nothing-meter">
                 <div
-                  className={`meter-bar ${isPlaying && isAudible ? 'meter-active' : ''}`}
+                  className={`meter-bar nothing-meter-bar ${isPlaying && isAudible ? 'meter-active' : ''}`}
                   style={{
-                    height: isPlaying && isAudible ? `${stem.volume * 90}%` : '6%',
-                    backgroundColor: stem.color,
+                    height: isPlaying && isAudible ? `${Math.max(stem.volume * 92, 10)}%` : '6%',
                   }}
                 />
               </div>
 
               {/* Fader & Value */}
-              <div className="channel-fader-section">
+              <div className="channel-fader-section nothing-fader-section">
                 <label htmlFor={`stem-fader-${stem.id}`} className="sr-only">
                   {stem.label} Volume
                 </label>
                 <input
                   id={`stem-fader-${stem.id}`}
                   type="range"
-                  className="apollo-range vertical-fader"
+                  className="apollo-range vertical-fader nothing-vertical-fader"
                   min={0}
                   max={1}
                   step={0.01}
@@ -231,19 +230,18 @@ export const JamRoomMixer: React.FC<JamRoomMixerProps> = ({
                       '--control-value': stem.volume * 100,
                       '--attr-min': 0,
                       '--attr-max': 100,
-                      '--slider-fill-color': stem.color,
                       '--slider-progress': `${stem.volume * 100}%`,
                     } as React.CSSProperties
                   }
                 />
-                <span className="volume-percentage">{Math.round(stem.volume * 100)}%</span>
+                <span className="volume-percentage nothing-font-mono">{Math.round(stem.volume * 100)}%</span>
               </div>
 
               {/* Solo & Mute Buttons */}
-              <div className="channel-actions">
+              <div className="channel-actions nothing-actions">
                 <button
                   type="button"
-                  className={`matrix-button solo-btn ${stem.isSolo ? 'active' : ''}`}
+                  className={`matrix-button nothing-solo-btn ${stem.isSolo ? 'active' : ''}`}
                   onClick={() => onToggleSolo(stem.id)}
                   aria-pressed={stem.isSolo}
                   title="Solo stem"
@@ -252,7 +250,7 @@ export const JamRoomMixer: React.FC<JamRoomMixerProps> = ({
                 </button>
                 <button
                   type="button"
-                  className={`matrix-button mute-btn ${stem.isMuted ? 'active' : ''}`}
+                  className={`matrix-button nothing-mute-btn ${stem.isMuted ? 'active' : ''}`}
                   onClick={() => onToggleMute(stem.id)}
                   aria-pressed={stem.isMuted}
                   title="Mute stem"

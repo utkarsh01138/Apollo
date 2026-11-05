@@ -91,3 +91,5 @@ basic_pitch_models/
 .DS_Store
 Thumbs.db
 desktop.ini
+*.pid
+.apollo.pid

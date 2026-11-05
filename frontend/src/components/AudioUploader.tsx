@@ -112,14 +112,17 @@ export const AudioUploader: React.FC<AudioUploaderProps> = ({ onSessionLoaded })
         />
 
         {isProcessing ? (
-          <div className="processing-state">
-            <Loader2 className="spinner-icon" size={40} />
-            <h3 className="processing-title">Demucs v4 Neural Separation</h3>
-            <p className="processing-subtitle">{stageMessage}</p>
+          <div className="processing-state nothing-processing-state">
+            <div className="nothing-processing-indicator">
+              <Loader2 className="spinner-icon nothing-spinner" size={32} />
+              <span className="nothing-led-dot red-pulse" />
+            </div>
+            <h3 className="processing-title nothing-font-dot">DEMUCS V4 // NEURAL SEPARATION</h3>
+            <p className="processing-subtitle nothing-font-mono">{stageMessage}</p>
             
-            <div className="progress-container">
+            <div className="progress-container nothing-progress-container">
               <div
-                className="progress-bar"
+                className="progress-bar nothing-progress-bar"
                 style={{ width: `${progress}%` }}
                 role="progressbar"
                 aria-valuenow={progress}
@@ -127,20 +130,20 @@ export const AudioUploader: React.FC<AudioUploaderProps> = ({ onSessionLoaded })
                 aria-valuemax={100}
               />
             </div>
-            <span className="progress-percent">{Math.round(progress)}%</span>
+            <span className="progress-percent nothing-font-mono">{Math.round(progress)}%</span>
           </div>
         ) : (
-          <div className="empty-state">
-            <div className="icon-badge">
-              <UploadCloud size={32} />
+          <div className="empty-state nothing-empty-state">
+            <div className="icon-badge nothing-icon-badge">
+              <UploadCloud size={28} />
             </div>
-            <h3 className="dropzone-title">Drop your multi-track audio here</h3>
-            <p className="dropzone-subtitle">
-              Supports <strong>MP3, WAV, FLAC, OGG, M4A</strong> up to 100MB
+            <h3 className="dropzone-title nothing-font-dot">DROP MULTI-TRACK AUDIO HERE</h3>
+            <p className="dropzone-subtitle nothing-font-mono">
+              SUPPORTS <strong>MP3 // WAV // FLAC // OGG // M4A</strong> (MAX 100MB)
             </p>
-            <button type="button" className="browse-button">
-              <Music size={16} />
-              <span>Select Audio File</span>
+            <button type="button" className="browse-button nothing-pill-btn primary">
+              <Music size={15} />
+              <span>SELECT AUDIO FILE</span>
             </button>
           </div>
         )}
