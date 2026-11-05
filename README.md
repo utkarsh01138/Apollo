@@ -127,7 +127,33 @@ Apollo/
 - **FFmpeg:** Installed and added to system `PATH` (required for Demucs audio decoding/encoding).
 - **Node.js:** v18+ (for frontend development).
 
-### Quickstart (Backend)
+### 🚀 One-Command Launch (Recommended)
+Start both the FastAPI ML backend and React frontend simultaneously with a single command from the project root:
+
+```bash
+# Using Python:
+python run.py
+
+# Or using npm:
+npm start
+
+# Or using PowerShell:
+.\start.ps1
+```
+
+Both servers start concurrently:
+- **Frontend UI ("The Jam Room"):** `http://localhost:5173`
+- **Backend API & Swagger Docs:** `http://127.0.0.1:8000/docs`
+
+To stop both services at any time:
+- Press `Ctrl + C` in the active terminal, or run:
+```bash
+python run.py stop
+# Or: npm run stop / .\stop.ps1
+```
+
+### Manual Component Quickstarts
+#### Backend
 ```bash
 cd backend
 python -m venv .venv
@@ -140,7 +166,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-### Quickstart (Frontend)
+#### Frontend
 ```bash
 cd frontend
 npm install

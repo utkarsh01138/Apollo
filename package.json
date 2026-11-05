@@ -1,0 +1,13 @@
+{
+  "name": "apollo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local music layer separation, stem extraction, and automated notation generation",
+  "scripts": {
+    "start": "python run.py",
+    "dev": "python run.py",
+    "stop": "python run.py stop",
+    "build:frontend": "cd frontend && npm run build",
+    "test:backend": "backend\\.venv\\Scripts\\python.exe backend\\tests\\run_tests.py"
+  }
+}
