@@ -18,21 +18,26 @@ import {
   fetchNotationData,
   getNotationFileDownloadUrl,
 } from '../services/api';
+import { AlphaTabRenderer } from './AlphaTabRenderer';
 
 interface NotationViewerProps {
   sessionId?: string;
   activeSessionFilename?: string;
   hasStems: boolean;
+  currentTime?: number;
+  isPlaying?: boolean;
 }
 
 export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
   sessionId,
   activeSessionFilename,
   hasStems,
+  currentTime = 0,
+  isPlaying = false,
 }) => {
   const [selectedStem, setSelectedStem] = useState<StemType>('bass');
   const [difficulty, setDifficulty] = useState<'beginner' | 'amateur' | 'pro'>('amateur');
-  const [notationStyle, setNotationStyle] = useState<'tab' | 'sheet'>('tab');
+  const [notationStyle, setNotationStyle] = useState<'tab' | 'sheet' | 'both'>('both');
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [stageMessage, setStageMessage] = useState<string>('');
@@ -147,7 +152,7 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
         <div className="control-group">
           <span className="control-label">
             <SlidersHorizontal size={14} />
-            <span>Difficulty Scaling:</span>
+            <span>Difficulty:</span>
           </span>
           <div className="segmented-control">
             {(['beginner', 'amateur', 'pro'] as const).map((level) => (
@@ -164,26 +169,33 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
           </div>
         </div>
 
-        {/* Tab vs Standard Sheet Music */}
+        {/* Style Selector: Tab vs Standard Sheet Music vs Both */}
         <div className="control-group">
           <span className="control-label">
             <Eye size={14} />
-            <span>Style:</span>
+            <span>View:</span>
           </span>
           <div className="segmented-control">
+            <button
+              type="button"
+              className={`seg-btn ${notationStyle === 'both' ? 'active' : ''}`}
+              onClick={() => setNotationStyle('both')}
+            >
+              Score + TAB
+            </button>
             <button
               type="button"
               className={`seg-btn ${notationStyle === 'tab' ? 'active' : ''}`}
               onClick={() => setNotationStyle('tab')}
             >
-              Tablature (TAB)
+              Tab Only
             </button>
             <button
               type="button"
               className={`seg-btn ${notationStyle === 'sheet' ? 'active' : ''}`}
               onClick={() => setNotationStyle('sheet')}
             >
-              Standard Notation
+              Standard Score
             </button>
           </div>
         </div>
@@ -203,7 +215,7 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
           </div>
         ) : notationData ? (
           <div className="notation-display-container">
-            {/* Metadata Banner */}
+            {/* Metadata Banner & File Downloads */}
             <div className="notation-metadata-banner">
               <div className="meta-pill">
                 <strong>Key:</strong> {notationData.metadata.key_signature}
@@ -246,102 +258,13 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
               )}
             </div>
 
-            {/* Dynamic Score / Tab Render */}
-            <div className="measures-scroll-view">
-              {notationStyle === 'tab' ? (
-                /* Tablature Render */
-                <div className="interactive-tab-score">
-                  {notationData.measures.slice(0, 8).map((measure) => (
-                    <div key={measure.number} className="tab-measure-block">
-                      <div className="measure-header">Bar {measure.number}</div>
-                      <div className="tab-grid">
-                        <div className="tab-string-row">
-                          <span className="tab-string-name">G |</span>
-                          <span className="tab-notes-line">
-                            {measure.notes.map((n, idx) =>
-                              n.is_rest ? (
-                                <span key={idx} className="tab-rest">-</span>
-                              ) : n.string === 1 ? (
-                                <span key={idx} className="tab-fret">{n.fret}</span>
-                              ) : (
-                                <span key={idx} className="tab-dash">-</span>
-                              )
-                            )}
-                          </span>
-                        </div>
-                        <div className="tab-string-row">
-                          <span className="tab-string-name">D |</span>
-                          <span className="tab-notes-line">
-                            {measure.notes.map((n, idx) =>
-                              n.is_rest ? (
-                                <span key={idx} className="tab-rest">-</span>
-                              ) : n.string === 2 ? (
-                                <span key={idx} className="tab-fret">{n.fret}</span>
-                              ) : (
-                                <span key={idx} className="tab-dash">-</span>
-                              )
-                            )}
-                          </span>
-                        </div>
-                        <div className="tab-string-row">
-                          <span className="tab-string-name">A |</span>
-                          <span className="tab-notes-line">
-                            {measure.notes.map((n, idx) =>
-                              n.is_rest ? (
-                                <span key={idx} className="tab-rest">-</span>
-                              ) : n.string === 3 ? (
-                                <span key={idx} className="tab-fret">{n.fret}</span>
-                              ) : (
-                                <span key={idx} className="tab-dash">-</span>
-                              )
-                            )}
-                          </span>
-                        </div>
-                        <div className="tab-string-row">
-                          <span className="tab-string-name">E |</span>
-                          <span className="tab-notes-line">
-                            {measure.notes.map((n, idx) =>
-                              n.is_rest ? (
-                                <span key={idx} className="tab-rest">-</span>
-                              ) : n.string === 4 ? (
-                                <span key={idx} className="tab-fret">{n.fret}</span>
-                              ) : (
-                                <span key={idx} className="tab-dash">-</span>
-                              )
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                /* Standard Notation Render */
-                <div className="interactive-sheet-score">
-                  {notationData.measures.slice(0, 8).map((measure) => (
-                    <div key={measure.number} className="sheet-measure-block">
-                      <div className="measure-header">Bar {measure.number}</div>
-                      <div className="sheet-notes-row">
-                        {measure.notes.map((n, idx) => (
-                          <div
-                            key={idx}
-                            className={`score-note-chip ${n.is_rest ? 'rest-chip' : ''}`}
-                            title={`Offset: ${n.offset}, Duration: ${n.duration} beat(s)`}
-                          >
-                            <span className="note-name">
-                              {n.is_rest ? 'Rest' : n.pitch}
-                            </span>
-                            <span className="note-duration">
-                              {n.duration === 1.0 ? '♩' : n.duration === 0.5 ? '♪' : '𝅘𝅥𝅯'}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Dynamic AlphaTab Vector Score Rendering */}
+            <AlphaTabRenderer
+              notationData={notationData}
+              notationStyle={notationStyle}
+              currentTime={currentTime}
+              isPlaying={isPlaying}
+            />
 
             {/* Difficulty Summary Info */}
             <div className="difficulty-insight">
@@ -361,7 +284,7 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
           <div className="staged-preview">
             <div className="preview-badge">
               <Music2 size={16} />
-              <span>Phase 2 Notation Engine Ready</span>
+              <span>AlphaTab Vector Engine Ready</span>
             </div>
 
             <div className="staff-graphic">
@@ -374,10 +297,10 @@ export const NotationPlaceholder: React.FC<NotationViewerProps> = ({
             </div>
 
             <div className="placeholder-info">
-              <h4>Audio-to-MIDI & Symbolic Transcription Engine</h4>
+              <h4>Audio-to-MIDI & Vector Notation Engine</h4>
               <p>
                 {hasStems
-                  ? 'Stems are loaded! Click below to transcribe the isolated audio stem into dynamic musical notation.'
+                  ? 'Stems are ready in the Jam Room! Click below to transcribe the isolated stem and render vector sheet music & tablature.'
                   : 'Upload an audio file on the left to extract stems and generate dynamic sheet music & tablature.'}
               </p>
 

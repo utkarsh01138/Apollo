@@ -112,10 +112,11 @@ Apollo/
 - [x] Build the interactive multi-track audio mixer ("The Jam Room") with synchronized Web Audio stems.
 - [x] Implement independent mute/solo matrices and time-stretch/tempo controls.
 
-### Phase 4: Dynamic Notation Rendering & Polish (Current Focus)
-- [ ] Integrate AlphaTab / VexFlow for interactive tablature and sheet music display.
-- [ ] Synchronize visual playhead cursor with active stem audio playback.
-- [ ] Implement dynamic difficulty and notation style toggles.
+### Phase 4: Dynamic Notation Rendering & Polish (Completed)
+- [x] Integrate AlphaTab for vector-sharp interactive tablature and sheet music display.
+- [x] Synchronize visual playhead cursor and measure auto-scrolling with active stem audio playback.
+- [x] Implement dynamic difficulty (Beginner, Amateur, Pro) and notation style (Score, TAB, Both) toggles.
+- [x] Enable one-click export for raw MIDI and MusicXML files.
 
 ---
 

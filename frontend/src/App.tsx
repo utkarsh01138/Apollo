@@ -93,6 +93,8 @@ export const App: React.FC = () => {
             sessionId={currentSession?.session_id}
             activeSessionFilename={currentSession?.original_filename}
             hasStems={Boolean(currentSession)}
+            currentTime={currentTime}
+            isPlaying={isPlaying}
           />
         </section>
       </main>

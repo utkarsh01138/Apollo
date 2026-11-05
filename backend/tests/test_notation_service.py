@@ -93,3 +93,4 @@ def test_notation_difficulty_scaling_pipeline():
             assert "fret" in first_note
             assert 1 <= first_note["string"] <= 4
             assert 0 <= first_note["fret"] <= 24
+
